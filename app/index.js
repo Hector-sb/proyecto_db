@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,20 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'admin123',
   database: process.env.DB_NAME || 'gastos',
   max: 10
+});
+
+// Check DB connection
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error acquiring client', err.stack);
+  }
+  client.query('SELECT NOW()', (err, result) => {
+    release();
+    if (err) {
+      return console.error('Error executing query', err.stack);
+    }
+    console.log('Connected to Database at:', result.rows[0].now);
+  });
 });
 
 async function query(sql, params) {
@@ -33,12 +48,39 @@ app.get('/api/users', async (req, res) => {
 });
 
 app.post('/api/users', async (req, res) => {
-  const { nombre, email, limite_gastos } = req.body;
-  const r = await query(
-    'INSERT INTO usuarios (nombre,email,limite_gastos) VALUES ($1,$2,$3) RETURNING *',
-    [nombre, email, limite_gastos || 0]
-  );
-  res.json(r.rows[0]);
+  const { nombre, email, limite_gastos, password } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Insert user
+    const userRes = await client.query(
+      'INSERT INTO usuarios (nombre,email,limite_gastos) VALUES ($1,$2,$3) RETURNING *',
+      [nombre, email, limite_gastos || 0]
+    );
+    const newUser = userRes.rows[0];
+
+    // 2. Hash password and insert into contraseñas
+    if (password) {
+      const salt = crypto.randomBytes(16).toString('hex');
+      const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+
+      await client.query(
+        'INSERT INTO contraseñas (usuario_id, password_hash, salt) VALUES ($1, $2, $3)',
+        [newUser.id, hash, salt]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.json(newUser);
+  } catch (e) {
+    await client.query('ROLLBACK');
+    console.error(e);
+    res.status(500).json({ error: 'Error creating user' });
+  } finally {
+    client.release();
+  }
 });
 
 app.get('/api/users/:id', async (req, res) => {
@@ -148,7 +190,7 @@ app.delete('/api/pagos/:id', async (req, res) => {
 });
 
 /* --- inicio del servidor --- */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);
 });

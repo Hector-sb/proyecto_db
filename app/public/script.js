@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://localhost:4000/api';
 
 // Utility to format currency
 const formatCurrency = (amount) => {
@@ -41,12 +41,13 @@ document.getElementById('user-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const nombre = document.getElementById('nombre').value;
     const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
     const limite = document.getElementById('limite').value;
 
     await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, email, limite_gastos: limite })
+        body: JSON.stringify({ nombre, email, password, limite_gastos: limite })
     });
 
     e.target.reset();
