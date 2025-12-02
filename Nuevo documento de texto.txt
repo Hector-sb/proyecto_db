@@ -1,0 +1,1 @@
+docker run -d ` --name postgres_proyecto `-p 5432:5432 `-e POSTGRES_USER=admin `-e POSTGRES_PASSWORD=12345 `-e POSTGRES_DB=Proyecto_db `-v ${PWD}/data:/var/lib/postgresql/data `postgres:latest

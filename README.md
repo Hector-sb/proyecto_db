@@ -19,3 +19,14 @@ Esto iniciará los siguientes servicios:
 - **App**: La aplicación principal en `http://localhost:3000`
 - **Base de datos**: PostgreSQL en el puerto `5432`
 - **pgAdmin**: Interfaz de administración de base de datos en `http://localhost:5050`
+
+## Credenciales
+
+### Base de datos (PostgreSQL)
+- Usuario: `admin`
+- Contraseña: `admin123`
+- Base de datos: `gastos`
+
+### pgAdmin
+- Email: `admin@gastos.com`
+- Contraseña: `admin123`
