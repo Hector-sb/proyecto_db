@@ -1,0 +1,17 @@
+{
+    "name": "proyecto-gastos-root",
+    "version": "1.0.0",
+    "description": "Scripts para ejecutar todo el proyecto (Backend + Frontend)",
+    "scripts": {
+        "setup": "npm install && cd backend && npm install",
+        "db:up": "sudo docker compose up -d db",
+        "start:backend": "cross-env DB_HOST=localhost DB_PORT=5433 npm --prefix backend start",
+        "start:frontend": "http-server frontend -p 8000 -c-1 --cors",
+        "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "http-server": "^14.1.1",
+        "cross-env": "^7.0.3"
+    }
+}
