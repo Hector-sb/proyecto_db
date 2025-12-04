@@ -45,6 +45,44 @@ Para usar la aplicación:
     Luego ve a `http://localhost:8000/login.html`.
 *   **Opción 4 (VS Code):** Usa la extensión "Live Server" en el archivo `login.html`.
 
+## Gestión de Contenedores Docker
+
+### Detener los contenedores (sin eliminarlos)
+Cuando termines de trabajar, puedes detener los contenedores manteniendo su estado:
+```bash
+docker compose stop
+```
+
+### Iniciar contenedores existentes
+Para volver a trabajar, simplemente inicia los contenedores que ya fueron creados:
+```bash
+docker compose start
+```
+
+### Detener y eliminar contenedores (mantener datos)
+Si quieres limpiar los contenedores pero mantener los datos de la base de datos:
+```bash
+docker compose down
+```
+Para volver a iniciar después de un `down`:
+```bash
+docker compose up -d
+```
+*Nota: No necesitas `--build` a menos que hayas modificado el código del backend.*
+
+### Ver estado de los contenedores
+Para verificar qué contenedores están corriendo:
+```bash
+docker compose ps
+```
+
+### Reiniciar contenedores
+Si necesitas reiniciar los servicios:
+```bash
+docker compose restart
+```
+
+
 ## Solución de Problemas Comunes
 
 *   **Permisos**: Si tienes errores de "Permission denied", asegúrate de usar `sudo` antes de los comandos de docker.
